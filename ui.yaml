@@ -1,0 +1,33 @@
+# module: api-ui
+backend: core-api
+
+# 1. Feature Configuration
+prefix: /admin/api
+
+# 2. Forms Configuration
+forms: {}
+
+# 3. Tables Configuration
+tables: {}
+
+# 4. Shell Registration
+shells:
+  - name: DashboardShell
+    matcher:
+      path: '/admin/api*'
+
+# 5. Pages
+pages:
+  - path: /admin/api/docs
+    layout: DashboardShell
+    component: ScalarDocs
+    permissions: [auth:sudo]
+    meta:
+      title: 'API Documentation'
+
+# 6. Registry
+registry:
+  - zone: sidebar-nav
+    component: ApiDocsLink
+    order: 100
+    permissions: [auth:sudo]

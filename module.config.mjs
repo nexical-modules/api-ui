@@ -1,5 +1,5 @@
 export default {
-    name: 'api-ui',
-    type: 'feature',
-    order: 90,
+  name: 'api-ui',
+  type: 'feature',
+  order: 90,
 };
