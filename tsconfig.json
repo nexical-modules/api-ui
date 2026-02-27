@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "../../"
+    },
+    "include": [
+        "src/**/*",
+        "../../src/**/*",
+        "../../../core/src/**/*",
+        "../../.astro/types.d.ts"
+    ]
+}

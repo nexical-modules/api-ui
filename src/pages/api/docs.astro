@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { ScalarDocs } from "../../components/ScalarDocs";
+import { config } from "@/lib/core/config";
+
+// In local dev, backend is on 4322. In prod, it should be defined in PUBLIC_SITE_URL or similar.
+// For now, let's try to determine it dynamically or use a proxy.
+// Given the symlink architecture, we can use an environment variable.
+const schemaUrl =
+    (import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:4322") +
+    "/api/schema";
+---
+
+<Layout title={`API Reference | ${config.PUBLIC_SITE_NAME}`} showShell={true}>
+    <div class="h-[calc(100vh-64px)] w-full overflow-hidden flex flex-col">
+        <ScalarDocs client:only="react" specUrl={schemaUrl} />
+    </div>
+</Layout>
+
+<style is:global>
+    /* Scalar container full height */
+    .scalar-app {
+        height: 100% !important;
+    }
+</style>
