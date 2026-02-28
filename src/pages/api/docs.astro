@@ -1,25 +1,88 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { ScalarDocs } from "../../components/ScalarDocs";
-import { config } from "@/lib/core/config";
+import Layout from '@/layouts/Layout.astro';
+import { ScalarDocs } from '../../components/ScalarDocs';
+import { config } from '@/lib/core/config';
 
-// In local dev, backend is on 4322. In prod, it should be defined in PUBLIC_SITE_URL or similar.
-// For now, let's try to determine it dynamically or use a proxy.
-// Given the symlink architecture, we can use an environment variable.
-const schemaUrl =
-    (import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:4322") +
-    "/api/schema";
+// In local dev, backend is on 4322. In prod, it should be defined in PUBLIC_API_URL.
+const schemaUrl = `${config.PUBLIC_API_URL}/schema`;
 ---
 
 <Layout title={`API Reference | ${config.PUBLIC_SITE_NAME}`} showShell={true}>
-    <div class="h-[calc(100vh-64px)] w-full overflow-hidden flex flex-col">
-        <ScalarDocs client:only="react" specUrl={schemaUrl} />
-    </div>
+  <div class="api-docs-container">
+    <ScalarDocs client:only="react" specUrl={schemaUrl} />
+  </div>
 </Layout>
 
 <style is:global>
-    /* Scalar container full height */
-    .scalar-app {
-        height: 100% !important;
-    }
+  /* 
+     API Documentation UI Refinement: 
+     Definitive fix for scrolling issues. 
+     We force the entire shell to be a viewport-constrained flexbox 
+     and enable scrolling specifically on the documentation wrapper.
+  */
+
+  /* 1. Constrain the entire application viewport */
+  html,
+  body,
+  .shell-root,
+  .shell-main,
+  .shell-content-scroll,
+  [data-radix-scroll-area-viewport],
+  .shell-content {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* 2. Remove standard shell padding and constraints that interfere with full-screen docs */
+  .shell-content {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  /* 3. Constrain the documentation container to the remaining viewport height */
+  /* Subtracting header height (standard 64px/var(--header-height)) */
+  .api-docs-container {
+    height: calc(100vh - 64px) !important;
+    height: calc(100vh - var(--header-height, 64px)) !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    overflow-y: auto !important; /* THE MAIN ENABLER */
+    scroll-behavior: smooth;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 4. Ensure Scalar Documentation takes up the full width/height of its parent */
+  .scalar-app {
+    width: 100% !important;
+    min-height: 100% !important;
+    height: auto !important; /* Allow it to expand to content height inside the scroller */
+  }
+
+  /* 5. Clean up any Scalar scrollers that might conflict */
+  .scalar-app [data-scroll-container] {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* 6. Fix for sidebar scrolling if Scalar uses its own sidebar scroller */
+  .references-sidebar {
+    height: calc(100vh - 64px) !important;
+    height: calc(100vh - var(--header-height, 64px)) !important;
+    overflow-y: auto !important;
+    position: sticky;
+    top: 0;
+  }
+
+  /* 7. Final check: Ensure nothing is locked by external tools */
+  body,
+  .shell-root {
+    pointer-events: auto !important;
+    user-select: auto !important;
+  }
 </style>

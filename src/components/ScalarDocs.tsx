@@ -35,6 +35,9 @@ export const ScalarDocs = ({ specUrl }: Props) => {
     layout: 'modern',
     hideClientButton: false,
     darkMode: isDark,
+    agent: {
+      disabled: true,
+    },
   } as const;
 
   return (
