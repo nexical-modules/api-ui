@@ -3,8 +3,9 @@ import Layout from '@/layouts/Layout.astro';
 import { ScalarDocs } from '../../components/ScalarDocs';
 import { config } from '@/lib/core/config';
 
-// In local dev, backend is on 4322. In prod, it should be defined in PUBLIC_API_URL.
+// In local dev, backend is usually on 4321. The value is defined in PUBLIC_API_URL.
 const schemaUrl = `${config.PUBLIC_API_URL}/schema`;
+console.log(`[API Docs] Scalar Schema URL: ${schemaUrl}`);
 ---
 
 <Layout title={`API Reference | ${config.PUBLIC_SITE_NAME}`} showShell={true}>
@@ -21,40 +22,62 @@ const schemaUrl = `${config.PUBLIC_API_URL}/schema`;
      and enable scrolling specifically on the documentation wrapper.
   */
 
-  /* 1. Constrain the entire application viewport */
+  /* 1. Force the page to be exactly the viewport height and non-scrollable at the root */
   html,
-  body,
-  .shell-root,
-  .shell-main,
-  .shell-content-scroll,
-  [data-radix-scroll-area-viewport],
-  .shell-content {
+  body {
     height: 100vh !important;
-    max-height: 100vh !important;
-    min-height: 0 !important;
+    width: 100vw !important;
     overflow: hidden !important;
+    position: fixed !important;
+    overscroll-behavior: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 2. Anchor the Shell Root to the Viewport */
+  /* This ensures the shell remains stationary even if the browser attempts to scroll the body (e.g. hash navigation) */
+  .shell-root {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    z-index: 10 !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important; /* Standard side-by-side for Details Panel */
+  }
+
+  .shell-main {
+    flex: 1 1 0% !important;
+    display: flex !important;
+    flex-direction: column !important; /* Stack Header and Content vertically */
+    min-width: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
   }
 
   /* 2. Remove standard shell padding and constraints that interfere with full-screen docs */
   .shell-content {
     max-width: none !important;
     padding: 0 !important;
+    height: 100% !important;
   }
 
   /* 3. Constrain the documentation container to the remaining viewport height */
   /* Subtracting header height (standard 64px/var(--header-height)) */
   .api-docs-container {
-    height: calc(100vh - 64px) !important;
-    height: calc(100vh - var(--header-height, 64px)) !important;
-    flex: 1 !important;
-    min-height: 0 !important;
-    width: 100% !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow-y: auto !important; /* THE MAIN ENABLER */
+    overflow-x: hidden !important;
     scroll-behavior: smooth;
-    position: relative;
     z-index: 1;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* 4. Ensure Scalar Documentation takes up the full width/height of its parent */
